@@ -1,4 +1,65 @@
+function renderBooks(filter) {
+  const booksWrapper = document.querySelector(".books");
+  const books = getBooks();
 
+  if (filter === "LOW TO HIGH") {
+    books.sort((a, b) => (a.salePrice || a.originalPrice) - (b.salePrice || b.originalPrice));
+  } else if (filter === "HIGH TO LOW") {
+    books.sort((a, b) => (b.salePrice || b.originalPrice) - (a.salePrice || a.originalPrice));
+  } else if (filter === "RATING") {
+    books.sort((a, b) => b.rating - a.rating);
+  }
+
+  const booksHtml = books
+    .map((book) => {
+      return `<div class="book">
+    <figure class="book__img--wrapper">
+      <img class="book__img" src="${book.url}" alt="" />
+    </figure>
+    <div class="book__title">
+      ${book.title}
+    </div>
+    <div class="book__ratings">
+      ${ratingHtml(book.rating)}
+    </div>
+    <div class="book__price">
+      ${priceHtml(book.originalPrice, book.salePrice)}
+    </div>
+  </div>`;
+    })
+    .join("");
+
+  booksWrapper.innerHTML = booksHtml;
+}
+
+function priceHtml(originalPrice, salePrice) {
+  if (!salePrice) {
+    return `$${originalPrice.toFixed(2)}`;
+  }
+  else {
+    return `<span class="book__price--normal">$${originalPrice.toFixed(2)}</span> $${salePrice.toFixed(2)}`;
+  }
+}
+
+function ratingHtml(rating) {
+  let ratingHtml = "";
+  for (let i = 0; i < Math.floor(rating); i++) {
+    ratingHtml += '<i class="fas fa-star"></i>\n';
+  }
+
+  if (!Number.isInteger(rating)) {
+    ratingHtml += '<i class="fas fa-star-half-alt"></i>\n';
+  }
+  return ratingHtml;
+}
+
+function filterBooks(event) {
+  renderBooks(event.target.value);
+}
+
+setTimeout(() => {
+  renderBooks();
+});
 
 // FAKE DATA
 function getBooks() {
@@ -6,7 +67,7 @@ function getBooks() {
     {
       id: 1,
       title: "Crack the Coding Interview",
-                url: "assets/crack the coding interview.png",
+      url: "assets/crack the coding interview.png",
       originalPrice: 49.95,
       salePrice: 14.95,
       rating: 4.5,
